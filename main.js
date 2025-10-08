@@ -490,9 +490,9 @@ const enemySprites = [
   "assets/enemy7.png",
 ];
 
-// Tamanho padrão desejado para inimigos normais (limites de caixa)
+// Tamanho padrão desejado para inimigos normais
 const ENEMY_BOX_W = 64;
-const ENEMY_BOX_H = 72; // se quiser quadrado use 64 aqui também
+const ENEMY_BOX_H = 72;
 
 function computeEnemyScaledSize(img) {
   if (img && img.width && img.height) {
@@ -507,9 +507,9 @@ function computeEnemyScaledSize(img) {
 
 // Boss e explosões
 const bossImg = new Image();
-bossImg.src = "assets/bossEnemy.png"; // spritesheet do ovni (substitua se nome diferente)
+bossImg.src = "assets/bossEnemy.png";
 const explosionImg = new Image();
-explosionImg.src = "assets/explosao.png"; // spritesheet horizontal quadrada (ex: 5 frames)
+explosionImg.src = "assets/explosao.png";
 let explosionFrameSize = 0;
 let explosionFrames = 1;
 explosionImg.onload = () => {
@@ -534,7 +534,6 @@ let enemyHeight = 0;
 enemyImg.onload = () => {
   enemyWidth = enemyImg.width;
   enemyHeight = enemyImg.height;
-  // Se por algum motivo ainda não spawnou (ex: reset antes de carregar), garante spawn
   if (enemies.length === 0) {
     spawnEnemies(currentLevel);
   }
@@ -551,7 +550,7 @@ function spawnEnemies(level) {
   // Fase 10 (level index 9): Boss
   if (level === 9) {
     const w = bossImg.width;
-    const h = bossImg.height; // se for spritesheet horizontal depois podemos animar
+    const h = bossImg.height;
     enemies.push({
       type: "boss",
       img: bossImg,
@@ -743,7 +742,7 @@ function updateEnemies(deltaTime) {
       }
     }
 
-    // Animação (2 frames horizontais, ajustar se houver sprite sheet maior)
+    // Animação
     if (typeof e.frameTimer === "number") {
       e.frameTimer += deltaTime;
       if (e.frameTimer > e.frameInterval) {
@@ -840,7 +839,7 @@ function isColliding(a, b) {
 // === UPDATE ===
 function update(deltaTime) {
   if (gameOver || paused) return; // não atualiza lógica se game over ou pausado
-  // Atualiza cenas (parallax atual e possível próxima)
+  // Atualiza cenas
   updateScenes(deltaTime);
   // Movimento player
   let moving = false;
@@ -917,8 +916,6 @@ function update(deltaTime) {
   });
 
   updatePowerUps(deltaTime);
-
-  // (Movimento e animação dos inimigos agora ocorrem em updateEnemies())
 
   // Colisões
   bullets.forEach((b, bi) => {
@@ -1004,7 +1001,6 @@ function draw() {
   ctx.clearRect(0, 0, WIDTH, HEIGHT);
   drawScenes();
 
-  // Define alinhamentos padrão para este frame (evita herdar 'center' do pause)
   ctx.textAlign = "left";
   ctx.textBaseline = "alphabetic";
 
@@ -1046,7 +1042,6 @@ function draw() {
     } else if (b.type === "missile") {
       if (rocketImg.width) {
         ctx.drawImage(rocketImg, b.x, b.y, b.w, b.h);
-        // chama simples pulsante
         const flameH = b.h * 0.3;
         const pulse = 0.6 + 0.4 * Math.sin(performance.now() * 0.02);
         ctx.globalAlpha = 0.8;
@@ -1084,7 +1079,7 @@ function draw() {
     }
   });
 
-  // Impacto do escudo (sobre a nave)
+  // Impacto do escudo
   if (shieldImpact.active && shieldHitImg.width) {
     const fw = shieldImpact.frameW;
     const fh = shieldImpact.frameH;
@@ -1115,7 +1110,7 @@ function draw() {
 
   // Explosões
   explosions.forEach((ex) => {
-    if (!explosionFrameSize) return; // ainda carregando
+    if (!explosionFrameSize) return;
     const size = explosionFrameSize * ex.scale;
     const sx = ex.frame * explosionFrameSize;
     ctx.drawImage(
@@ -1131,7 +1126,7 @@ function draw() {
     );
   });
 
-  // UI (garante alinhamento à esquerda)
+  // === UI ===
   ctx.fillStyle = "#0ff";
   ctx.font = "16px Consolas";
   ctx.textAlign = "left";
@@ -1144,7 +1139,6 @@ function draw() {
   ctx.fillStyle = "white";
   ctx.font = "20px Arial";
   const vidaText = "Vidas: " + player.lives;
-  // canto inferior esquerdo (10px de margem)
   ctx.fillText(vidaText, 20, HEIGHT - 20);
   if (player.shieldHits > 0) {
     ctx.fillStyle = "#4af";
@@ -1207,7 +1201,6 @@ function draw() {
     ctx.font = "24px Arial";
     ctx.fillText("Jogar Novamente", WIDTH / 2, btnY + btnH / 2 + 8);
     ctx.restore();
-    // Guarda região para hit test
     victoryButtonBounds.x = btnX;
     victoryButtonBounds.y = btnY;
     victoryButtonBounds.w = btnW;
